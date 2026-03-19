@@ -2,8 +2,6 @@
 
 const queryOne = (selector) => document.querySelector(selector);
 
-const queryAll = (selector) => document.querySelectorAll(selector);
-
 const getElementIndex = (nodeList, node) => [...nodeList].indexOf(node);
 
 const extractNumber = (str) => {
@@ -60,15 +58,11 @@ const updateTbody = (tbody, newOrder) => {
   const frag = document.createDocumentFragment();
 
   newOrder.forEach((o) => frag.append(o.el));
-  tbody.innerHTML = '';
-  tbody.appendChild(frag);
+  tbody.replaceChildren(frag);
 };
 
 const onHeaderClick = (e, headers, tbody) => {
   const th = e.target.closest('th');
-
-  headers.forEach((h) => h.classList.remove('sorted-asc', 'sorted-desc'));
-  th.classList.add('sorted-asc');
 
   if (!th) {
     return;
@@ -80,6 +74,9 @@ const onHeaderClick = (e, headers, tbody) => {
     return;
   }
 
+  headers.forEach((h) => h.classList.remove('sorted-asc', 'sorted-desc'));
+  th.classList.add('sorted-asc');
+
   const rowsArr = getRowsArray(tbody.rows, numberColumn);
 
   const newOrder = sortRowsAscCopy(rowsArr);
@@ -89,8 +86,13 @@ const onHeaderClick = (e, headers, tbody) => {
 
 (() => {
   const thead = queryOne('table thead');
-  const headers = queryAll('table th');
   const tbody = queryOne('tbody');
+
+  if (!thead || !tbody) {
+    return;
+  }
+
+  const headers = thead.querySelectorAll('th');
 
   thead.addEventListener('click', (e) => {
     onHeaderClick(e, headers, tbody);
